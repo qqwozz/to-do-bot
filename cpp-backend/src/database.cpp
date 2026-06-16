@@ -55,7 +55,7 @@ int Database::createPlan(const std::string& title, const std::string& descriptio
     rc = sqlite3_step(stmt);
     sqlite3_finalize(stmt);
 
-    return (rc == SQLITE_DONE) ? static_cast<int>(sqlite3_last_insert_row_id(db)) : -1;
+    return (rc == SQLITE_DONE) ? static_cast<int>(sqlite3_last_insert_rowid(db)) : -1;
 }
 
 std::vector<Plan> Database::getPlansByDate(const std::string& date) {

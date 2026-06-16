@@ -44,7 +44,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential cmake pkg-config libsqlite3-dev libssl-dev libgtest-dev
+          sudo apt-get install -y build-essential cmake pkg-config libsqlite3-dev libssl-dev libasio-dev libgtest-dev
 
       - name: Install Crow
         run: |
@@ -65,14 +65,14 @@ jobs:
         run: |
           cd cpp-backend
           mkdir -p build && cd build
-          cmake .. -DBUILD_TESTS=ON
+          cmake .. -DCROW_INCLUDE_DIR=/usr/local/include -DBUILD_TESTS=ON
           make -j$(nproc)
 
       - name: Build tests
         run: |
           cd cpp-backend/tests
           mkdir -p build && cd build
-          cmake .. && make -j$(nproc)
+          cmake .. -DCROW_INCLUDE_DIR=/usr/local/include && make -j$(nproc)
 
       - name: Run tests
         run: |

@@ -38,7 +38,7 @@ jobs:
         if: matrix.language == 'cpp'
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential cmake pkg-config libsqlite3-dev libssl-dev
+          sudo apt-get install -y build-essential cmake pkg-config libsqlite3-dev libssl-dev libasio-dev
 
       - name: Install Crow
         if: matrix.language == 'cpp'
@@ -58,7 +58,7 @@ jobs:
         run: |
           cd cpp-backend
           mkdir -p build && cd build
-          cmake .. -DCMAKE_BUILD_TYPE=Release
+          cmake .. -DCMAKE_BUILD_TYPE=Release -DCROW_INCLUDE_DIR=/usr/local/include
           make -j$(nproc)
 
       - name: Autobuild
