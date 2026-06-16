@@ -1,0 +1,39 @@
+name: Deploy
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    needs: [go-tests, cpp-tests]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build and push Docker images
+        run: |
+          echo "Build backend..."
+          cd cpp-backend && docker build -t todo-backend:latest .
+          echo "Build bot..."
+          cd .. && docker build -t todo-bot:latest .
+          echo "Done!"
+
+  # Раскомментируйте для реального деплоя:
+  # deploy-production:
+  #   runs-on: ubuntu-latest
+  #   needs: deploy
+  #   steps:
+  #     - name: Deploy to server
+  #       uses: appleboy/ssh-action@v1
+  #       with:
+  #         host: ${{ secrets.SERVER_HOST }}
+  #         username: ${{ secrets.SERVER_USER }}
+  #         key: ${{ secrets.SSH_KEY }}
+  #         script: |
+  #           cd /opt/todo-bot
+  #           git pull
+  #           docker-compose down
+  #           docker-compose up -d --build

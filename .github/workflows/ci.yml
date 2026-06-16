@@ -1,0 +1,112 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  go-tests:
+    name: Go Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+
+      - name: Download dependencies
+        run: go mod download
+
+      - name: Run tests
+        run: go test -v -race -coverprofile=coverage.out ./...
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: go-coverage
+          path: coverage.out
+
+  cpp-tests:
+    name: C++ Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake pkg-config libsqlite3-dev libssl-dev libgtest-dev
+
+      - name: Build Google Test
+        run: |
+          cd /usr/src/gtest
+          sudo cmake .
+          sudo make
+          sudo cp lib/*.a /usr/lib/
+
+      - name: Build project
+        run: |
+          cd cpp-backend
+          mkdir -p build && cd build
+          cmake .. -DBUILD_TESTS=ON
+          make -j$(nproc)
+
+      - name: Build tests
+        run: |
+          cd cpp-backend/tests
+          mkdir -p build && cd build
+          cmake .. && make -j$(nproc)
+
+      - name: Run tests
+        run: |
+          cd cpp-backend/tests/build
+          ./database_tests
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+
+      - name: Run gofmt
+        run: |
+          if [ -n "$(gofmt -l .)" ]; then
+            echo "Files not formatted:"
+            gofmt -l .
+            exit 1
+          fi
+
+      - name: Run go vet
+        run: go vet ./...
+
+  docker-build:
+    name: Docker Build
+    runs-on: ubuntu-latest
+    needs: [go-tests, cpp-tests]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build backend
+        run: |
+          cd cpp-backend
+          docker build -t todo-backend:test .
+
+      - name: Build bot
+        run: |
+          docker build -t todo-bot:test .

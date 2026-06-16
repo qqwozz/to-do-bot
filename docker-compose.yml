@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./cpp-backend
+      dockerfile: Dockerfile
+    container_name: todo-backend
+    ports:
+      - "8081:8081"
+    volumes:
+      - todo-data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: todo-bot
+    environment:
+      - BOT_TOKEN=${BOT_TOKEN}
+      - BACKEND_URL=http://backend:8081
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  todo-data:
+    driver: local
