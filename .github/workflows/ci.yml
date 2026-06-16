@@ -49,10 +49,9 @@ jobs:
       - name: Install Crow
         run: |
           git clone --depth 1 https://github.com/CrowCpp/Crow.git /tmp/crow
-          sudo mkdir -p /usr/local/include/crow
-          sudo cp -r /tmp/crow/include/crow/* /usr/local/include/crow/
-          sudo ln -sf /usr/local/include/crow/crow.h /usr/local/include/crow.h
-          ls /usr/local/include/crow/ | head -10
+          sudo cp -r /tmp/crow/include/crow /usr/local/include/crow
+          sudo cp /tmp/crow/include/crow.h /usr/local/include/crow.h
+          rm -rf /tmp/crow
 
       - name: Build Google Test
         run: |
