@@ -3,8 +3,14 @@ FROM ubuntu:22.04 AS builder
 
 RUN apt-get update && apt-get install -y \
     build-essential cmake pkg-config \
-    libsqlite3-dev libssl-dev curl \
+    libsqlite3-dev libssl-dev curl git \
     && rm -rf /var/lib/apt/lists/*
+
+RUN git clone --depth 1 https://github.com/CrowCpp/Crow.git /tmp/crow && \
+    mkdir -p /usr/local/include/crow && \
+    cp -r /tmp/crow/include/crow/* /usr/local/include/crow/ && \
+    ln -sf /usr/local/include/crow/crow.h /usr/local/include/crow.h && \
+    rm -rf /tmp/crow
 
 WORKDIR /build
 COPY CMakeLists.txt include/ src/ main.cpp ./
