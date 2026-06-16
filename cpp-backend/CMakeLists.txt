@@ -7,7 +7,18 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(SQLITE3 REQUIRED sqlite3)
-find_package(Crow REQUIRED)
+find_package(OpenSSL REQUIRED)
+
+if(NOT CROW_INCLUDE_DIR)
+    find_path(CROW_INCLUDE_DIR crow.h
+        HINTS /usr/local/include
+        HINTS /usr/include
+    )
+endif()
+
+if(NOT CROW_INCLUDE_DIR)
+    message(FATAL_ERROR "Crow headers not found. Set CROW_INCLUDE_DIR or install Crow.")
+endif()
 
 set(SOURCES
     main.cpp
@@ -26,11 +37,13 @@ add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_SOURCE_DIR}/include
     ${SQLITE3_INCLUDE_DIRS}
+    ${CROW_INCLUDE_DIR}
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
-    Crow::Crow
     ${SQLITE3_LIBRARIES}
+    OpenSSL::SSL
+    OpenSSL::Crypto
     pthread
 )
 
