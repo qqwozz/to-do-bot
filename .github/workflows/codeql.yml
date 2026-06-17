@@ -56,7 +56,7 @@ jobs:
       - name: Build C++ project
         if: matrix.language == 'cpp'
         run: |
-          cd cpp-backend
+          cd app/cpp-backend
           mkdir -p build && cd build
           cmake .. -DCMAKE_BUILD_TYPE=Release -DCROW_INCLUDE_DIR=/usr/local/include
           make -j$(nproc)

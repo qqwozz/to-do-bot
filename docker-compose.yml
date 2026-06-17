@@ -3,7 +3,7 @@ version: '3.8'
 services:
   backend:
     build:
-      context: ./cpp-backend
+      context: ./app/cpp-backend
       dockerfile: Dockerfile
     container_name: todo-backend
     ports:

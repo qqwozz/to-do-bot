@@ -5,7 +5,6 @@
 *.dylib
 *.test
 *.out
-/go-bot/bin/
 bin/
 
 # C++ Build
@@ -13,8 +12,8 @@ bin/
 *.obj
 *.a
 *.lib
-/cpp-backend/build/
-/cpp-backend/tests/build/
+app/cpp-backend/build/
+app/cpp-backend/tests/build/
 
 # SQLite
 *.db

@@ -26,24 +26,19 @@ func NewClient(baseURL string) *Client {
 func (c *Client) CreatePlan(plan PlanRequest) error {
 	data, err := json.Marshal(plan)
 	if err != nil {
-		return fmt.Errorf("ошибка маршалинга: %w", err)
+		return fmt.Errorf("marshal: %w", err)
 	}
 
-	resp, err := c.httpClient.Post(
-		c.baseURL+"/plans",
-		"application/json",
-		bytes.NewReader(data),
-	)
+	resp, err := c.httpClient.Post(c.baseURL+"/plans", "application/json", bytes.NewReader(data))
 	if err != nil {
-		return fmt.Errorf("ошибка запроса: %w", err)
+		return fmt.Errorf("request: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusCreated {
 		body, _ := io.ReadAll(resp.Body)
-		return fmt.Errorf("backend вернул %d: %s", resp.StatusCode, string(body))
+		return fmt.Errorf("backend %d: %s", resp.StatusCode, string(body))
 	}
-
 	return nil
 }
 
@@ -53,24 +48,22 @@ func (c *Client) GetPlansByDate(date string) ([]Plan, error) {
 	return plans, err
 }
 
-func (c *Client) GetPlansByDateRange(startDate, endDate string) ([]Plan, error) {
+func (c *Client) GetPlansByDateRange(start, end string) ([]Plan, error) {
 	var plans []Plan
-	url := fmt.Sprintf("/plans/range?start=%s&end=%s", startDate, endDate)
-	err := c.getJSON(url, &plans)
+	err := c.getJSON(fmt.Sprintf("/plans/range?start=%s&end=%s", start, end), &plans)
 	return plans, err
 }
 
-func (c *Client) getJSON(path string, target interface{}) error {
+func (c *Client) getJSON(path string, target any) error {
 	resp, err := c.httpClient.Get(c.baseURL + path)
 	if err != nil {
-		return fmt.Errorf("ошибка запроса: %w", err)
+		return fmt.Errorf("request: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
-		return fmt.Errorf("backend вернул %d: %s", resp.StatusCode, string(body))
+		return fmt.Errorf("backend %d: %s", resp.StatusCode, string(body))
 	}
-
 	return json.NewDecoder(resp.Body).Decode(target)
 }

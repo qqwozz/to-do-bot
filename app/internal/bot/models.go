@@ -1,6 +1,5 @@
 package bot
 
-// Plan представляет план задачи, полученный от backend
 type Plan struct {
 	ID          int    `json:"id"`
 	Title       string `json:"title"`
@@ -11,7 +10,6 @@ type Plan struct {
 	CreatedAt   string `json:"created_at"`
 }
 
-// PlanRequest представляет запрос на создание плана
 type PlanRequest struct {
 	Title       string `json:"title"`
 	Description string `json:"description"`

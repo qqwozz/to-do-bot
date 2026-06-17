@@ -19,24 +19,24 @@ docker-logs: ## Show logs
 	docker-compose logs -f
 
 backend-build: ## Build C++ backend
-	cd cpp-backend && mkdir -p build && cd build && cmake .. && make -j$$(nproc)
+	cd app/cpp-backend && mkdir -p build && cd build && cmake .. && make -j$$(nproc)
 
 backend-run: ## Run backend locally
-	cd cpp-backend/build && ./todo-backend
+	cd app/cpp-backend/build && ./todo-backend
 
-bot-run: ## Run Go bot locally
-	go run cmd/bot/main.go
+bot-run: ## Run Go bot
+	cd app && go run cmd/bot/main.go
 
 test-go: ## Run Go tests
-	go test -v -race ./...
+	cd app && go test -v -race ./...
 
 test-cpp: ## Build C++ tests
-	cd cpp-backend/tests && mkdir -p build && cd build && cmake .. && make -j$$(nproc)
+	cd app/cpp-backend/tests && mkdir -p build && cd build && cmake .. && make -j$$(nproc)
 
 test-cpp-run: ## Run C++ tests
-	cd cpp-backend/tests/build && ./database_tests
+	cd app/cpp-backend/tests/build && ./database_tests
 
 test: test-go test-cpp test-cpp-run ## Run all tests
 
 clean: ## Clean build artifacts
-	rm -rf cpp-backend/build cpp-backend/tests/build bin *.db
+	rm -rf app/cpp-backend/build app/cpp-backend/tests/build bin *.db
